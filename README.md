@@ -228,7 +228,7 @@ def handle_client(client_socket, addr):
                     # Respond to heartbeat
                     client_socket.send(b'[PONG]\n')
                 
-                elif msg.startsWith('[PHOTO_'):
+                elif msg.startswith('[PHOTO_'):
                     print(f"  → 📸 Photo data received")
                 
                 elif msg == 'status':

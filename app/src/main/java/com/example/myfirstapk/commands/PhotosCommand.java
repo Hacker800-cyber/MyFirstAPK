@@ -131,23 +131,16 @@ public class PhotosCommand {
                 return;
             }
 
-            FileInputStream fis = new FileInputStream(file);
-            byte[] buffer = new byte[4096];
-            int bytesRead;
-            long totalBytes = 0;
-
             // Send photo header
             out.println("[PHOTO_START]");
             out.println("[PHOTO_NAME] " + file.getName());
             out.println("[PHOTO_SIZE] " + file.length());
             out.flush();
 
-            // For now, just send a notification that photo would be uploaded
-            // In a real implementation, you'd send the binary data
+            // Send notification that photo would be uploaded
+            // In a full implementation, you'd send the binary data here
             out.println("[PHOTO_DATA] " + file.length() + " bytes from " + path);
             out.flush();
-
-            fis.close();
 
             Log.d(TAG, "📤 Uploaded photo: " + file.getName() + " (" + file.length() + " bytes)");
 

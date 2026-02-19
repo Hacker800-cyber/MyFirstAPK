@@ -92,10 +92,10 @@ public class SocketService extends Service {
         connectToServer();            // Start connection process
     }
 
-    // ================= WAKELOCK =================
     /**
      * Initialize and acquire wake lock to keep CPU running
      * This prevents the device from sleeping while service is active
+     * Note: Uses indefinite lock - ensure proper release in onDestroy
      */
     private void initWakeLock() {
         try {
@@ -104,8 +104,9 @@ public class SocketService extends Service {
                 PowerManager.PARTIAL_WAKE_LOCK,
                 "MyFirstAPK::Wakelock"
             );
-            wakeLock.acquire(); // Acquire indefinitely – release only on service destroy
-            Log.d(TAG, "⚡ WakeLock acquired (indefinite)");
+            // Acquire with 10 minute timeout, will be renewed by heartbeat
+            wakeLock.acquire(10 * 60 * 1000L); // 10 minutes
+            Log.d(TAG, "⚡ WakeLock acquired (10 min timeout)");
         } catch (Exception e) {
             Log.e(TAG, "❌ WakeLock error", e);
         }
@@ -198,10 +199,10 @@ public class SocketService extends Service {
         });
     }
 
-    // ================= HEARTBEAT =================
     /**
      * Start periodic heartbeat to keep connection alive
      * Sends heartbeat every 30 seconds and triggers reconnect on failure
+     * Also renews wake lock to prevent battery drain
      */
     private void startHeartbeat() {
         heartbeatRunnable = () -> {
@@ -210,6 +211,12 @@ public class SocketService extends Service {
                     out.println("[HEARTBEAT]");
                     out.flush();
                     Log.d(TAG, "💓 Heartbeat sent");
+                    
+                    // Renew wake lock on each heartbeat
+                    if (wakeLock != null && !wakeLock.isHeld()) {
+                        wakeLock.acquire(10 * 60 * 1000L); // 10 minutes
+                        Log.d(TAG, "⚡ WakeLock renewed");
+                    }
                 } catch (Exception e) {
                     Log.e(TAG, "❌ Heartbeat failed – reconnecting...");
                     isConnected.set(false);
