@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">MyFirstAPK</string>
+    <string name="server_ip_hint">Server IP Address</string>
+    <string name="server_port_hint">Server Port</string>
+    <string name="start_service">Start Service</string>
+    <string name="stop_service">Stop Service</string>
+    <string name="capture_photo">Capture and Upload Photo</string>
+    <string name="service_status">Service Status: %s</string>
+    <string name="status_running">Running</string>
+    <string name="status_stopped">Stopped</string>
+</resources>
