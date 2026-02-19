@@ -1,0 +1,29 @@
+# Android Studio
+*.iml
+.gradle/
+build/
+local.properties
+/.idea/
+*.hprof
+*.cxx/
+.externalNativeBuild/
+
+# Java class files
+*.class
+
+# Kotlin
+*.kts
+
+# Miscellaneous
+*.log
+*.jar
+*.war
+*.ear
+*.class
+*.dll
+*.exe
+*.o
+*.so
+*.bin
+*.apk
+*.ap_
