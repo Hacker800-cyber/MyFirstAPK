@@ -94,20 +94,15 @@ public class SocketService extends Service {
     private void listenForCommands() {
         while (isRunning && socket != null && !socket.isClosed()) {
             try {
-                if (inputStream.available() > 0) {
-                    String command = inputStream.readUTF();
-                    Log.d(TAG, "Received command: " + command);
-                    handleCommand(command);
-                }
-                
-                // Small delay to prevent busy waiting
-                Thread.sleep(100);
+                // Blocking read - will wait for data to arrive
+                String command = inputStream.readUTF();
+                Log.d(TAG, "Received command: " + command);
+                handleCommand(command);
                 
             } catch (IOException e) {
-                Log.e(TAG, "Error reading command: " + e.getMessage());
-                break;
-            } catch (InterruptedException e) {
-                Log.e(TAG, "Thread interrupted: " + e.getMessage());
+                if (isRunning) {
+                    Log.e(TAG, "Error reading command: " + e.getMessage());
+                }
                 break;
             }
         }

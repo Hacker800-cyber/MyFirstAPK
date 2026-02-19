@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity {
         statusText = findViewById(R.id.statusText);
         
         // Set default values
-        serverIpInput.setText("127.0.0.1");
+        serverIpInput.setHint("e.g., 192.168.1.100");
         serverPortInput.setText("8080");
         
         updateServiceButtons();

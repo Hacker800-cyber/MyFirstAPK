@@ -104,20 +104,50 @@ print("Waiting for connection...")
 client, addr = server.accept()
 print(f"Connected: {addr}")
 
+def read_utf8_string(sock):
+    """Read a UTF-8 string with Java's DataOutputStream format (2-byte length prefix)"""
+    length_bytes = sock.recv(2)
+    if len(length_bytes) < 2:
+        return None
+    length = struct.unpack('!H', length_bytes)[0]
+    return sock.recv(length).decode('utf-8')
+
 while True:
     try:
-        # Read message length (UTF-8)
-        msg = client.recv(1024).decode('utf-8')
+        # Read message (Java DataOutputStream format)
+        msg = read_utf8_string(client)
+        if not msg:
+            break
+            
         print(f"Received: {msg}")
         
         if msg == "PHOTO_UPLOAD":
-            # Read photo size
-            size = struct.unpack('!I', client.recv(4))[0]
-            # Read photo data
-            photo_data = client.recv(size)
+            # Read photo size (4 bytes, big-endian integer)
+            size_bytes = client.recv(4)
+            size = struct.unpack('!I', size_bytes)[0]
+            
+            # Read photo data in chunks
+            photo_data = b''
+            remaining = size
+            while remaining > 0:
+                chunk = client.recv(min(4096, remaining))
+                if not chunk:
+                    break
+                photo_data += chunk
+                remaining -= len(chunk)
+            
+            # Save photo
             with open('received_photo.jpg', 'wb') as f:
                 f.write(photo_data)
-            print(f"Photo saved: {size} bytes")
+            print(f"Photo saved: {len(photo_data)} bytes")
+            
+        # Send responses for specific commands
+        elif msg == "CLIENT_CONNECTED":
+            print("Client connected successfully")
+        elif msg == "PING":
+            # Would send "PONG" back if needed
+            pass
+            
     except Exception as e:
         print(f"Error: {e}")
         break
